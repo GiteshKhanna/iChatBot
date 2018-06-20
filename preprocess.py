@@ -33,7 +33,7 @@ def add_extra_to_dict(word_to_index,index_to_word,word_to_vec_map,embedding_dim=
     
     #Adding vector maps
     word_to_vec_map[GO] = np.random.uniform(-1.0,1.0, size = embedding_dim )
-    word_to_vec_map[EOS] = np.random.uniform(-1.0,1.0, size = embedding_dim )
+    word_to_vec_map[EOS] = np.zeros(embedding_dim)
     word_to_vec_map[UNK] = np.random.uniform(-1.0,1.0, size = embedding_dim )
     
     return word_to_index[GO],word_to_index[EOS],word_to_index[UNK]
@@ -43,41 +43,109 @@ def add_extra_to_dict(word_to_index,index_to_word,word_to_vec_map,embedding_dim=
 Preprocesses the decoder input and output: Adds GO and EOS and UNK 
 '''
 def fit_decoder_text(data,word_to_index,max_allowed_seq_length):
-    sentence_indices_input = np.array([[]])
-    sentence_indices_output = np.array([[]])
+    sentence_indices_input = []
+    sentence_indices_output = []
+    seq_length_list = []
     for txt in data:
-        txt =  GO + ' ' + txt.lower() + ' '+ EOS
-        print('Added tags..')
-        print(txt)
+        txt = txt.lower()
+        #print(txt)
         words = nltk.word_tokenize(txt)
-        print("After tokenization")
-        print(words)
+        #print("After tokenization")
+        #print(words)
         words = [word for word in words if word.isalnum()]
-        print('Selected as words:')
-        print(words)
+        #print('Selected as words:')
+        #print(words)
+        words =  [GO] + words + [EOS]
+        #print('Added tags..')
+        #print(words)
+        #print(len(words))
         seq_length = len(words)
+        #If sequence length > max allowed
         if max_allowed_seq_length is not None and seq_length > max_allowed_seq_length:
             seq_length = max_allowed_seq_length
             words = words[:seq_length - 1] + [EOS]
         else:
-            words = words + [EOS]
-
+            while(len(words)!=max_allowed_seq_length):
+                words = words + [EOS]
+        #Appending Seq length
+        seq_length_list += [seq_length]
         decoder_phrase = []
         for w in words:
+            
             if w in word_to_index:
                 decoder_phrase += [word_to_index[w]]
             else:
                 decoder_phrase += [word_to_index[UNK]]
-                
-        np.append(sentence_indices_input,decoder_phrase[:-1])
-        np.append(sentence_indices_output,decoder_phrase[1:])
+            
+        #print("Decoder_phrase: ")
+        #print(decoder_phrase)
+        #print(len(decoder_phrase))
+        sentence_indices_input += [decoder_phrase[:-1]]
+        sentence_indices_output += [decoder_phrase[1:]]
+        #print()
+        #print()
+        #print()
         
+    return (sentence_indices_input), (sentence_indices_output), seq_length_list
 
-    return np.asarray(sentence_indices_input), np.asarray(sentence_indices_output)
-
-
+'''
+#Testing fit_decoder_text
 wi , iw, wv = read_glove_vecs()
 _,_,_ = add_extra_to_dict(wi,iw,wv)
 X, Y = read_csv()
 
-dinput,doutput= fit_decoder_text(data= Y[1:],word_to_index = wi,max_allowed_seq_length = 15)
+dinput,doutput,seq_lengths= fit_decoder_text(data= Y[1:],word_to_index = wi,max_allowed_seq_length = 15)
+'''
+
+def fit_encoder_text(data,word_to_index,max_allowed_seq_length):
+    sentence_indices_input = []
+    seq_length_list = []
+    for txt in data:
+        txt = txt.lower()
+        #print(txt)
+        words = nltk.word_tokenize(txt)
+        #print("After tokenization")
+        #print(words)
+        words = [word for word in words if word.isalnum()]
+        #print('Selected as words:')
+        #print(words)
+        words =  words + [EOS]
+        #print('Added tags..')
+        #print(words)
+        #print(len(words))
+        seq_length = len(words)
+        
+        #If sequence length > max allowed
+        if max_allowed_seq_length is not None and seq_length > max_allowed_seq_length:
+            seq_length = max_allowed_seq_length
+            words = words[:seq_length - 1] + [EOS]
+        else:
+            while(len(words)!=max_allowed_seq_length):
+                words = words + [EOS]
+        #Appending Seq length
+        seq_length_list += [seq_length]
+        decoder_phrase = []
+        for w in words:
+            
+            if w in word_to_index:
+                decoder_phrase += [word_to_index[w]]
+            else:
+                decoder_phrase += [word_to_index[UNK]]
+            
+        #print("Decoder_phrase: ")
+        #print(decoder_phrase)
+        #print(len(decoder_phrase))
+        sentence_indices_input += [decoder_phrase]
+        #print()
+        #print()
+        #print()
+    return sentence_indices_input,seq_length_list
+
+'''
+#Testing fit_encoder_text
+wi , iw, wv = read_glove_vecs()
+_,_,_ = add_extra_to_dict(wi,iw,wv)
+X, Y = read_csv()
+
+einput,seq_lengths= fit_encoder_text(data= X[1:],word_to_index = wi,max_allowed_seq_length = 150)
+'''

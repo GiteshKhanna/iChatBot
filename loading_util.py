@@ -15,7 +15,7 @@ def read_glove_vecs(glove_file="./glove.6B.50d.txt"):
             words.add(curr_word)
             word_to_vec_map[curr_word] = np.array(line[1:], dtype=np.float64)
         
-        i = 1
+        i = 0
         words_to_index = {}
         index_to_words = {}
         for w in sorted(words):
@@ -40,6 +40,14 @@ def read_csv(filename = 'data/data_10.csv'):
     Y = np.asarray(ques)
 
     return X, Y
+
+def map_dict_to_list(iw, wv):
+    emb = []
+    for idx in range(0,len(iw)):
+        emb.append(wv[iw[idx]])
+    return emb
+        
+
 '''      
 def plot_confusion_matrix(y_actu, y_pred, title='Confusion matrix', cmap=plt.cm.gray_r):
     
@@ -60,7 +68,11 @@ def plot_confusion_matrix(y_actu, y_pred, title='Confusion matrix', cmap=plt.cm.
 
 
 '''
+#Testing all
+#Remember importing from other file
 #read_csv()
 wi,iw,wv = read_glove_vecs("./glove.6B.50d.txt")
 add_extra_to_dict(wi,iw,wv)
+emb = map_dict_to_list(iw,wv)
+print(emb[0])
 '''

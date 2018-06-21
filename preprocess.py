@@ -14,22 +14,22 @@ UNK = 'UNK'
 extra_tokens = [GO,EOS,UNK]
 
 '''
-Indexing starts from 1 till 400000 without adding extra tokens. Function adds
+Indexing starts from 0 till 399999 without adding extra tokens. Function adds
 extra tokens inside the 3 dictionaries
 Returns: start_token index, end_token index , unk_token index
 '''
 def add_extra_to_dict(word_to_index,index_to_word,word_to_vec_map,embedding_dim= 50):
     #Adding decoder starter token
-    word_to_index[GO] = len(word_to_index) + 1
-    index_to_word[len(word_to_index)] = GO
+    word_to_index[GO] = len(word_to_index)
+    index_to_word[len(word_to_index)-1] = GO
 
     #Adding end token
-    word_to_index[EOS] = len(word_to_index) + 1
-    index_to_word[len(word_to_index)] = EOS
+    word_to_index[EOS] = len(word_to_index)
+    index_to_word[len(word_to_index)-1] = EOS
 
     #Adding unknown token
-    word_to_index[UNK] = len(word_to_index) + 1
-    index_to_word[len(word_to_index)] = UNK
+    word_to_index[UNK] = len(word_to_index)
+    index_to_word[len(word_to_index)-1] = UNK
     
     #Adding vector maps
     word_to_vec_map[GO] = np.random.uniform(-1.0,1.0, size = embedding_dim )
@@ -143,6 +143,7 @@ def fit_encoder_text(data,word_to_index,max_allowed_seq_length):
 
 '''
 #Testing fit_encoder_text
+#Remember importing from another file
 wi , iw, wv = read_glove_vecs()
 _,_,_ = add_extra_to_dict(wi,iw,wv)
 X, Y = read_csv()

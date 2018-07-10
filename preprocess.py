@@ -141,6 +141,52 @@ def fit_encoder_text(data,word_to_index,max_allowed_seq_length):
         #print()
     return sentence_indices_input,seq_length_list
 
+
+def fit_essay_text(data,word_to_index,max_allowed_seq_length=64*5):
+    sentence_indices_input = []
+    seq_length_list = []
+    for txt in data:
+        txt = txt.lower()
+        #print(txt)
+        words = nltk.word_tokenize(txt)
+        #print("After tokenization")
+        #print(words)
+        words = [word for word in words if word.isalnum()]
+        #print('Selected as words:')
+        #print(words)
+        words =  words + [EOS]
+        #print('Added tags..')
+        #print(words)
+        #print(len(words))
+        seq_length = len(words)
+        
+        #If sequence length > max allowed
+        if max_allowed_seq_length is not None and seq_length > max_allowed_seq_length:
+            seq_length = max_allowed_seq_length
+            words = words[:seq_length - 1] + [EOS]
+        else:
+            while(len(words)!=max_allowed_seq_length):
+                words = words + [EOS]
+        #Appending Seq length
+        seq_length_list += [seq_length]
+        decoder_phrase = []
+        for w in words:
+            
+            if w in word_to_index:
+                decoder_phrase += [word_to_index[w]]
+            else:
+                decoder_phrase += [word_to_index[UNK]]
+            
+        #print("Decoder_phrase: ")
+        #print(decoder_phrase)
+        #print(len(decoder_phrase))
+        sentence_indices_input += [decoder_phrase]
+        #print()
+        #print()
+        #print()
+    return sentence_indices_input,seq_length_list
+
+
 '''
 #Testing fit_encoder_text
 #Remember importing from another file

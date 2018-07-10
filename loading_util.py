@@ -2,7 +2,6 @@ import csv
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
-from sklearn.metrics import confusion_matrix
 #from preprocess import add_extra_to_dict
 
 def read_glove_vecs(glove_file="./glove.6B.50d.txt"):
@@ -46,26 +45,26 @@ def map_dict_to_list(iw, wv):
     for idx in range(0,len(iw)):
         emb.append(wv[iw[idx]])
     return emb
-        
 
-'''      
-def plot_confusion_matrix(y_actu, y_pred, title='Confusion matrix', cmap=plt.cm.gray_r):
-    
-    df_confusion = pd.crosstab(y_actu, y_pred.reshape(y_pred.shape[0],), rownames=['Actual'], colnames=['Predicted'], margins=True)
-    
-    df_conf_norm = df_confusion / df_confusion.sum(axis=1)
-    
-    plt.matshow(df_confusion, cmap=cmap) # imshow
-    #plt.title(title)
-    plt.colorbar()
-    tick_marks = np.arange(len(df_confusion.columns))
-    plt.xticks(tick_marks, df_confusion.columns, rotation=45)
-    plt.yticks(tick_marks, df_confusion.index)
-    #plt.tight_layout()
-    plt.ylabel(df_confusion.index.name)
-    plt.xlabel(df_confusion.columns.name)
-'''
+def read_csv_essay(filename = 'data/essays.csv'):
+    essays=[]
+    traits=[]
 
+    with open(filename) as csvDataFile:
+        csvReader = csv.reader(csvDataFile)
+
+        for row in csvReader:
+            essays.append(row[1])
+            example = row[2:]
+            example = [0 if(x=='n') else 1 for x in example]
+            traits.append(example)
+
+    essays = np.asarray(essays)
+    traits = np.asarray(traits)
+
+    return essays[1:],traits[1:]
+    
+            
 
 '''
 #Testing all

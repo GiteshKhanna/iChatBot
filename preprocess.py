@@ -141,6 +141,15 @@ def fit_encoder_text(data,word_to_index,max_allowed_seq_length):
         #print()
     return sentence_indices_input,seq_length_list
 
+'''
+#Testing fit_encoder_text
+#Remember importing from another file
+wi , iw, wv = read_glove_vecs()
+_,_,_ = add_extra_to_dict(wi,iw,wv)
+X, Y = read_csv()
+
+einput,seq_lengths= fit_encoder_text(data= X[1:],word_to_index = wi,max_allowed_seq_length = 150)
+'''
 
 def fit_essay_text(data,word_to_index,max_allowed_seq_length=64*5):
     sentence_indices_input = []
@@ -186,13 +195,9 @@ def fit_essay_text(data,word_to_index,max_allowed_seq_length=64*5):
         #print()
     return sentence_indices_input,seq_length_list
 
+def seq2words(seq,iw):
+    sent=[]
+    for i in seq:
+        sent = sent + [iw[i]]
 
-'''
-#Testing fit_encoder_text
-#Remember importing from another file
-wi , iw, wv = read_glove_vecs()
-_,_,_ = add_extra_to_dict(wi,iw,wv)
-X, Y = read_csv()
-
-einput,seq_lengths= fit_encoder_text(data= X[1:],word_to_index = wi,max_allowed_seq_length = 150)
-'''
+    return sent
